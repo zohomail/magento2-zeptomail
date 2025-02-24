@@ -3,6 +3,7 @@
    "description": "Zoho ZeptoMail plugin for magento2",  
    "type": "magento2-module",
    "license":"Apache-2.0",
+   "version": "1.0.0",
    "authors": [
       {
          "name": "zmintegration",
