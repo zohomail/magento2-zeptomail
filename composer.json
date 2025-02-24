@@ -3,7 +3,6 @@
    "description": "Zoho ZeptoMail plugin for magento2",  
    "type": "magento2-module",
    "license":"Apache-2.0",
-   "version": "1.0.0",
    "authors": [
       {
          "name": "zmintegration",
@@ -12,10 +11,6 @@
          "role": "Developer"
       }
    ], 
-   "require": {
-        "php": ">=7.1.3 ~7.4.0||~8.1.0",
-        "magento/framework": "^102.0.5||103.0.*"
-    },
    "autoload": { 
       "files": [
          "registration.php" 
@@ -23,7 +18,5 @@
       "psr-4": {
          "Zoho\\ZeptoMail\\": ""
       }
-   },
-   "minimum-stability": "stable",
-    "prefer-stable": true
+   }
 }
