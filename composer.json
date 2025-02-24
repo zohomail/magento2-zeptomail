@@ -1,5 +1,5 @@
 {
-   "name": "zoho/magento2-zeptomail", 
+   "name": "zohomail/magento2-zeptomail", 
    "description": "Zoho ZeptoMail plugin for magento2",  
    "type": "magento2-module",
    "license":"Apache-2.0",
