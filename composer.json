@@ -23,5 +23,7 @@
       "psr-4": {
          "Zoho\\ZeptoMail\\": ""
       }
-   }
+   },
+   "minimum-stability": "dev",
+    "prefer-stable": true
 }
