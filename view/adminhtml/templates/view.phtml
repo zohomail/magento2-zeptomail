@@ -1,0 +1,93 @@
+
+<?php
+	use Zoho\ZeptoMail\Helper\ZConstants;
+	
+	$formKey = $this->getBlockHtml('formkey');
+	$zepto_domain = $this->getDomain();
+?>
+<script type="text/javascript">
+	function addZeptoSuccessMessage(message) {
+		document.getElementById("zepto_messages").style.display = 'block';
+		document.getElementById("zept_msg_class").className  ="message message-success success";
+		document.getElementById("zepto-msgText").innerHTML = message;
+		setTimeout(function() {document.getElementById("zepto_messages").style.display = 'none' }, 5000);
+		window.scrollTo(0,0)
+    }
+	function addZeptoErrorMessage(message) {
+		document.getElementById("zepto_messages").style.display = 'block';
+		document.getElementById("zept_msg_class").className  ="message message-error error";
+		document.getElementById("zepto-msgText").innerHTML = message;
+		setTimeout(function() {document.getElementById("zepto_messages").style.display = 'none' }, 5000);
+		window.scrollTo(0,0)
+    }
+</script>
+
+	<div class="zepto_page">
+		
+		<div class="zepto_page__content">
+		<div id="zepto_messages" style="display:none;"><div class="page messages"><div class="message message-error error" id="zept_msg_class"><div id="zepto-msgText"></div></div></div></div>
+		<form name="f" id="zept-oauth-form" method="post" action="<?php echo $block->getUrl('zeptoauth/authsettings/index'); ?>"  data-mage-init='{"validation": {}}'>
+       
+			<img src="<?php echo $this->getViewFileUrl('Zoho_ZeptoMail::images/zeptomail.svg');?>" style="width:160px;padding-bottom:16px;"/>
+			
+            <div class="zepto_page__header">
+                
+                <p>Visit  <a class="zm_a" href="https://zeptomail.zoho.com/#dashboard/setupDetail" target="_blank">here</a> to generate your Send Mail token.</p>
+            </div>
+			<?php  echo $formKey; ?>
+			<input type="hidden" <?php ; ?> name="option" value="saveOAuthSettings" />
+				
+            <div class="zepto_form">
+				<div class="zepto_form__row">
+                    <label class="zepto_form--label"><?= $block->escapeHtml(__('Where is your account hosted?')) ?></label>
+                    <select class="zepto_form--input zepto_form--input--select" name="zepto_domain">
+                        <option value="zoho.com" <?php if($zepto_domain == "zoho.com") {?> selected="true"<?php } ?>>zeptomail.zoho.com</option>
+                        <option value="zoho.eu" <?php if($zepto_domain == "zoho.eu") {?> selected="true"<?php } ?>>zeptomail.zoho.eu</option>
+                        <option value="zoho.in" <?php if($zepto_domain == "zoho.in") {?> selected="true"<?php } ?>>zeptomail.zoho.in</option>
+                        <option value="zoho.com.cn" <?php if($zepto_domain == "zoho.com.cn") {?> selected="true"<?php } ?>>zeptomail.zoho.com.cn</option>
+                        <option value="zoho.com.au" <?php if($zepto_domain == "zoho.com.au") {?> selected="true"<?php } ?>>zeptomail.zoho.com.au</option>
+						<option value="zoho.jp" <?php if($zepto_domain == "zoho.jp") {?> selected="true"<?php } ?>>zeptomail.zoho.jp</option>
+						<option value="zohocloud.ca" <?php if($zepto_domain == "zohocloud.ca") {?> selected="true"<?php } ?>>zeptomail.zohocloud.ca</option>
+						<option value="zoho.sa" <?php if($zepto_domain == "zoho.sa") {?> selected="true"<?php } ?>>zeptomail.zoho.sa</option>
+                    </select> <br><i class="form__row-info"> <?= $block->escapeHtml(__('The region where your ZeptoMail account is hosted. This is the URL displayed on login to your account.')) ?></i> </div>
+				</div>
+				<div class="zepto_form__row">
+                    <label class="zepto_form--label"><?= $block->escapeHtml(__('Send Mail Token')) ?></label>
+                    <input type="password" value="<?= $block->escapeHtmlAttr($this->getMailToken()) ?>" name="zepto_mail_token" class="zepto_form--input" id="zepto_mail_token" required=""> 
+                    <i class="form__row-info"><?= $block->escapeHtml(__('Send Mail token of the relevant Mail Agent generated in your ZeptoMail account.')) ?></i> 
+                 </div>
+				<div class="zepto_form__row">
+                    <label class="zepto_form--label"><?= $block->escapeHtml(__('General Contact')) ?></label>
+                     <input type="text" data-validate='{required:true, "validate-email":true}' <?php ; ?> name="zepto_ident_general"  value="<?= $block->escapeHtmlAttr($this->getTransmailEmailAddress(ZConstants::ident_general,$this->getStoreId())) ?>" class="zepto_form--input" id="zepto_ident_general" required="">
+				</div>
+				<div class="zepto_form__row">
+                    <label class="zepto_form--label"><?= $block->escapeHtml(__('Customer Support')) ?></label>
+                     <input type="text" data-validate='{required:true, "validate-email":true}' <?php ; ?> name="zepto_ident_support"  value="<?= $block->escapeHtmlAttr($this->getTransmailEmailAddress(ZConstants::ident_support,$this->getStoreId())) ?>" class="zepto_form--input" id="zepto_ident_support" required=""> 
+				</div>
+				<div class="zepto_form__row">
+                    <label class="zepto_form--label"><?= $block->escapeHtml(__('Sales Representative')) ?></label>
+                     <input type="text" data-validate='{required:true, "validate-email":true}' <?php ; ?> name="zepto_ident_sales"  value="<?= $block->escapeHtmlAttr($this->getTransmailEmailAddress(ZConstants::ident_sales,$this->getStoreId())) ?>" class="zepto_form--input" id="zepto_ident_sales" required=""> 
+				</div>
+				<div class="zepto_form__row">
+                    <label class="zepto_form--label"><?= $block->escapeHtml(__('Custom Email 1')) ?></label>
+                     <input type="text" data-validate='{required:true, "validate-email":true}' <?php ; ?> name="zepto_ident_custom1"  value="<?= $block->escapeHtmlAttr($this->getTransmailEmailAddress(ZConstants::ident_custom1,$this->getStoreId())) ?>" class="zepto_form--input" id="zepto_ident_custom1" required=""> 
+				</div>
+				<div class="zepto_form__row">
+                    <label class="zepto_form--label"><?= $block->escapeHtml(__('Custom Email 2')) ?></label>
+                     <input type="text" data-validate='{required:true, "validate-email":true}' <?php ; ?> name="zepto_ident_custom2"  value="<?= $block->escapeHtmlAttr($this->getTransmailEmailAddress(ZConstants::ident_custom2,$this->getStoreId())) ?>" class="zepto_form--input" id="zepto_ident_custom2" required=""> 
+				</div>
+				<div >
+						<br /><button class="zepto_btn" type="submit" <?php ; ?> name="submit" class="button button-primary button-large"><?= $block->escapeHtml(__('Save')) ?> 
+							</button> &nbsp;
+						<button class="zepto_btn" type="button" id="zepto_test_btn" name="test" class="button button-primary button-large"><?= $block->escapeHtml(__('Test')) ?>  
+							</button>
+							
+				</div>
+			
+		
+		</form>
+	</div>
+</div>	
+
+
+

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+		
+        <add id="Zoho_ZeptoMail::Auth"
+        	 title="ZeptoMail"
+        	 module="Zoho_ZeptoMail"
+        	 sortOrder="52"
+			 action="zeptoauth/authsettings"
+        	 resource="Zoho_ZeptoMail::Auth"
+			 />
+    </menu>
+</config>

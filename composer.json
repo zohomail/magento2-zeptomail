@@ -1,0 +1,22 @@
+{
+   "name": "zoho/magento2-zeptomail", 
+   "description": "Zoho ZeptoMail plugin for magento2",  
+   "type": "magento2-module",
+   "license":"Apache-2.0",
+   "authors": [
+      {
+         "name": "zmintegration",
+         "email": "zmintegration@zohomail.com",
+         "homepage": "http://zoho.com/mail",
+         "role": "Developer"
+      }
+   ], 
+   "autoload": { 
+      "files": [
+         "registration.php" 
+      ],
+      "psr-4": {
+         "Zoho\\ZeptoMail\\": ""
+      }
+   }
+}

@@ -1,0 +1,13 @@
+#menu-zoho-zeptomail-auth.level-0 > a:before {
+	content: '';
+    width: 100%;
+    background: url(../images/zepto-menu.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+	background-size: 26px;
+    opacity: 0.6;
+	transition:opacity 0.3s ease;
+}
+#menu-zoho-zeptomail-auth.level-0:hover > a:before {
+    opacity: 1;
+}
