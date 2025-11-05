@@ -90,7 +90,7 @@ class Transport extends MagentoTransport implements TransportInterface
 			} else {
 				$parsedBody['attachments'][] = [
 						'content' => base64_encode($part->getRawContent()),
-						'name' => $part->filename,
+						'name' => $part->getFileName(),
 						'mime_type' => $part->getType()
 					];
 			}
