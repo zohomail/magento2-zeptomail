@@ -118,16 +118,15 @@ class Transport extends MagentoTransport implements TransportInterface
 		if ($headers['To'] !== null) {
 			$toRecipients = $headers['To'];
 			$mail_data['to'] = $this::getEmailDetails($toRecipients);
-			
         }
 		if (array_key_exists('Cc',$headers)) {
 			$ccRecipients = $headers['Cc'];
 			$mail_data['cc'] = $this::getEmailDetails($ccRecipients);
-			
         }
+		
 		if (array_key_exists('Bcc',$headers)) {
 			$bccRecipients = $headers['Bcc'];
-			
+			$mail_data['bcc'] = $this::getEmailDetails($bccRecipients);
         }
 		
 		if (array_key_exists('Subject',$headers)) {
