@@ -56,7 +56,7 @@ class Transport extends MagentoTransport implements TransportInterface
      *
      * @return void
      */
-    public function sendMessage()
+    public function sendMessage(): void
     {
 		if(!isset($this->storeId)){
 			parent::sendMessage();
