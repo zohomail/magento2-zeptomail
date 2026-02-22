@@ -5,7 +5,7 @@ namespace Zoho\ZeptoMail\Mail;
 
 use InvalidArgumentException;
 use Magento\Framework\App\ObjectManager;
-use Magento\Framework\Mail\MessageInterface;
+use Magento\Framework\Mail\EmailMessageInterface;
 use Magento\Framework\Mail\Transport as MagentoTransport;
 use Magento\Framework\Mail\TransportInterface;
 use Magento\Framework\Phrase;
@@ -37,7 +37,7 @@ class Transport extends MagentoTransport implements TransportInterface
 	protected $storeManager;
 	protected $storeId;
 
-    public function __construct(MessageInterface $message, StoreManagerInterface $storeManager, $parameters = null, ?LoggerInterface $logger = null, ?OauthConfig $oauthConfig = null)
+    public function __construct(EmailMessageInterface $message, StoreManagerInterface $storeManager, $parameters = null, ?LoggerInterface $logger = null, ?OauthConfig $oauthConfig = null)
     {
 		$this->message = $message;
 		$this->storeManager = $storeManager;
