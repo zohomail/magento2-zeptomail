@@ -72,7 +72,7 @@ class Transport extends MagentoTransport implements TransportInterface
 			return;
 		}
 		$zeptoAPI = new ZeptoMailApi($domain,$authtoken);
-		$body = $this->message->getBody();
+		$body = $this->message->getMessageBody();
         $parsedBody = [
             'text' => '',
 			'html' => '',
