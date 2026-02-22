@@ -37,7 +37,7 @@ class Transport extends MagentoTransport implements TransportInterface
 	protected $storeManager;
 	protected $storeId;
 
-    public function __construct(MessageInterface $message,StoreManagerInterface $storeManager, $parameters = null, LoggerInterface $logger = null,OauthConfig $oauthConfig=null)
+    public function __construct(MessageInterface $message, StoreManagerInterface $storeManager, $parameters = null, ?LoggerInterface $logger = null, ?OauthConfig $oauthConfig = null)
     {
 		$this->message = $message;
 		$this->storeManager = $storeManager;
