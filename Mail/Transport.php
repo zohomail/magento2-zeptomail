@@ -56,7 +56,7 @@ class Transport extends MagentoTransport implements TransportInterface
      *
      * @return void
      */
-    public function sendMessage()
+    public function sendMessage(): void
     {
 		if(!isset($this->storeId)){
 			parent::sendMessage();
@@ -80,21 +80,34 @@ class Transport extends MagentoTransport implements TransportInterface
         ];
 
 		$parsedBody['ishtml'] = false;
-        foreach ($body->getParts() as $part) {
-			if ($part->getType() == 'text/plain') {
-				$parsedBody['text'] .= $part->getRawContent();
-			}
-			else if ($part->getType() == 'text/html') {
-				$parsedBody['html'] .= $part->getRawContent();
+		if ($body instanceof \Symfony\Component\Mime\Part\TextPart) {
+			$mimeType = $body->getMediaType() . '/' . $body->getMediaSubtype();
+			$content = $body->getBody();
+			if ($mimeType === 'text/plain') {
+				$parsedBody['text'] .= $content;
+			} elseif ($mimeType === 'text/html') {
+				$parsedBody['html'] .= $content;
 				$parsedBody['ishtml'] = true;
-			} else {
-				$parsedBody['attachments'][] = [
-						'content' => base64_encode($part->getRawContent()),
-						'name' => $part->getFileName(),
-						'mime_type' => $part->getType()
-					];
 			}
-			
+		} elseif ($body instanceof \Symfony\Component\Mime\Part\AbstractMultipartPart) {
+			foreach ($body->getParts() as $part) {
+				$mimeType = $part->getMediaType() . '/' . $part->getMediaSubtype();
+				if ($part instanceof \Symfony\Component\Mime\Part\TextPart) {
+					$content = $part->getBody();
+					if ($mimeType === 'text/plain') {
+						$parsedBody['text'] .= $content;
+					} elseif ($mimeType === 'text/html') {
+						$parsedBody['html'] .= $content;
+						$parsedBody['ishtml'] = true;
+					}
+				} else {
+					$parsedBody['attachments'][] = [
+							'content' => base64_encode($part->getBody()),
+							'name' => $part instanceof \Symfony\Component\Mime\Part\DataPart ? $part->getFilename() : '',
+							'mime_type' => $mimeType
+					];
+				}
+			}
 		}
 		
 		
@@ -102,35 +115,42 @@ class Transport extends MagentoTransport implements TransportInterface
 		
 		
 		$to = $cc = $bcc = $reply_to = array();
-		$headers = $message->getHeaders();
-		
-		$fromAddress =$this:: splitNameAndAddress($headers['From']);
-		
 		$mail_data = array();
-		if ($headers['From'] !== null) {
+		$fromAddresses = $message->getFrom();
+		if (!empty($fromAddresses)) {
+			$fromAddress = $fromAddresses[0]->getName() . ' <' . $fromAddresses[0]->getEmail() . '>';
+			$fromAddress = $this::splitNameAndAddress($fromAddress);
 			if (!in_array(strtolower($fromAddress['address']), $allowed_emails)){
 				$fromAddress['address'] = $this->oauthconfig->getTransmailEmailAddress(ZConstants::ident_general,$this->storeId);
 			}
 			$mail_data['from'] =  $fromAddress;
-			
-        }
-		
-		if ($headers['To'] !== null) {
-			$toRecipients = $headers['To'];
+		}
+		$toAddresses = $message->getTo();
+		if (!empty($toAddresses)) {
+			$toRecipients = array();
+			foreach ($toAddresses as $address) {
+				$toRecipients[] = !empty($address->getName()) ? $address->getName() . ' <' . $address->getEmail() . '>' : $address->getEmail();
+			}
 			$mail_data['to'] = $this::getEmailDetails($toRecipients);
         }
-		if (array_key_exists('Cc',$headers)) {
-			$ccRecipients = $headers['Cc'];
+		$ccAddresses = $message->getCc();
+		if (!empty($ccAddresses)) {
+			$ccRecipients = array();
+			foreach ($ccAddresses as $address) {
+				$ccRecipients[] = !empty($address->getName()) ? $address->getName() . ' <' . $address->getEmail() . '>' : $address->getEmail();
+			}
 			$mail_data['cc'] = $this::getEmailDetails($ccRecipients);
         }
-		
-		if (array_key_exists('Bcc',$headers)) {
-			$bccRecipients = $headers['Bcc'];
+		$bccAddresses = $message->getBcc();
+		if (!empty($bccAddresses)) {
+			$bccRecipients = array();
+			foreach ($bccAddresses as $address) {
+				$bccRecipients[] = !empty($address->getName()) ? $address->getName() . ' <' . $address->getEmail() . '>' : $address->getEmail();
+			}
 			$mail_data['bcc'] = $this::getEmailDetails($bccRecipients);
         }
-		
-		if (array_key_exists('Subject',$headers)) {
-			$subject = $headers['Subject'];
+		$subject = $message->getSubject();
+		if ($subject !== null) {
 			$mail_data['subject'] = $subject;
         }
 		if($parsedBody['attachments']){
