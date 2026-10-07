@@ -5,7 +5,7 @@ namespace Zoho\ZeptoMail\Mail;
 
 use InvalidArgumentException;
 use Magento\Framework\App\ObjectManager;
-use Magento\Framework\Mail\MessageInterface;
+use Magento\Framework\Mail\EmailMessageInterface;
 use Magento\Framework\Mail\Transport as MagentoTransport;
 use Magento\Framework\Mail\TransportInterface;
 use Magento\Framework\Phrase;
@@ -37,17 +37,17 @@ class Transport extends MagentoTransport implements TransportInterface
 	protected $storeManager;
 	protected $storeId;
 
-    public function __construct(MessageInterface $message,StoreManagerInterface $storeManager, $parameters = null, LoggerInterface $logger = null,OauthConfig $oauthConfig=null)
+    public function __construct(EmailMessageInterface $message,StoreManagerInterface $storeManager, $parameters = null, LoggerInterface $logger = null,OauthConfig $oauthConfig=null)
     {
 		$this->message = $message;
 		$this->storeManager = $storeManager;
 		$this->logger = $logger ?: ObjectManager::getInstance()->get(LoggerInterface::class);
-		$this->oauthconfig = $logger ?: ObjectManager::getInstance()->get(OauthConfig::class);
+		$this->oauthconfig = $oauthConfig ?: ObjectManager::getInstance()->get(OauthConfig::class);
 		$this->parameters = $parameters;
 		if($storeManager->getStore()){
 			$this->storeId =$storeManager->getStore()->getId();
 		}
-        parent::__construct($message, $parameters);
+        parent::__construct($message, $logger);
 		
     }
 
@@ -80,35 +80,7 @@ class Transport extends MagentoTransport implements TransportInterface
         ];
 
 		$parsedBody['ishtml'] = false;
-		if ($body instanceof \Symfony\Component\Mime\Part\TextPart) {
-			$mimeType = $body->getMediaType() . '/' . $body->getMediaSubtype();
-			$content = $body->getBody();
-			if ($mimeType === 'text/plain') {
-				$parsedBody['text'] .= $content;
-			} elseif ($mimeType === 'text/html') {
-				$parsedBody['html'] .= $content;
-				$parsedBody['ishtml'] = true;
-			}
-		} elseif ($body instanceof \Symfony\Component\Mime\Part\AbstractMultipartPart) {
-			foreach ($body->getParts() as $part) {
-				$mimeType = $part->getMediaType() . '/' . $part->getMediaSubtype();
-				if ($part instanceof \Symfony\Component\Mime\Part\TextPart) {
-					$content = $part->getBody();
-					if ($mimeType === 'text/plain') {
-						$parsedBody['text'] .= $content;
-					} elseif ($mimeType === 'text/html') {
-						$parsedBody['html'] .= $content;
-						$parsedBody['ishtml'] = true;
-					}
-				} else {
-					$parsedBody['attachments'][] = [
-							'content' => base64_encode($part->getBody()),
-							'name' => $part instanceof \Symfony\Component\Mime\Part\DataPart ? $part->getFilename() : '',
-							'mime_type' => $mimeType
-					];
-				}
-			}
-		}
+		$this->parseMimePart($body, $parsedBody);
 		
 		
 		$message = $this->message;
@@ -190,6 +162,35 @@ class Transport extends MagentoTransport implements TransportInterface
 		
     }
 	
+	private function parseMimePart($part, array &$parsedBody)
+	{
+		if ($part instanceof \Symfony\Component\Mime\Part\DataPart) {
+			$mimeType = $part->getMediaType() . '/' . $part->getMediaSubtype();
+			$parsedBody['attachments'][] = [
+				'content' => base64_encode($part->getBody()),
+				'name' => $part->getFilename() ?: '',
+				'mime_type' => $mimeType
+			];
+			return;
+		}
+		if ($part instanceof \Symfony\Component\Mime\Part\TextPart) {
+			$mimeType = $part->getMediaType() . '/' . $part->getMediaSubtype();
+			$content = $part->getBody();
+			if ($mimeType === 'text/plain') {
+				$parsedBody['text'] .= $content;
+			} elseif ($mimeType === 'text/html') {
+				$parsedBody['html'] .= $content;
+				$parsedBody['ishtml'] = true;
+			}
+			return;
+		}
+		if ($part instanceof \Symfony\Component\Mime\Part\AbstractMultipartPart) {
+			foreach ($part->getParts() as $childPart) {
+				$this->parseMimePart($childPart, $parsedBody);
+			}
+		}
+	}
+
 	private function splitNameAndAddress($emailAddress) {
 		$result = [
 			'name' => '',
